@@ -1,16 +1,15 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
-
-@app.route('/api/exam', methods=['POST'])
-def exam():
-    data = request.get_json()
-    # Process the exam data
-    return jsonify({'message': 'Exam processed successfully!', 'data': data})
+    return render_template_string('''
+    <!doctype html>
+    <title>Flask NEC 2023 Trainer</title>
+    <h1>Welcome to Flask NEC 2023 Trainer</h1>
+    <p>Learning Flask with inline templates!</p>
+    ''')
 
 if __name__ == '__main__':
     app.run(debug=True)
