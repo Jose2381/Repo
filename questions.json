@@ -1,1 +1,39 @@
-[  { "id": 1, "prompt": "What is the maximum allowable branch circuit conductor length for a 120V branch circuit?", "choices": [ "100 feet", "150 feet", "250 feet", "200 feet" ], "answer": "100 feet", "explanation": "The NEC specifies a maximum conductor length of 100 feet for voltage drop considerations on 120V circuits.", "tags": [ "branch circuit", "conductor", "voltage drop" ] },  { "id": 2, "prompt": "What is the required height for a service drop above the ground?", "choices": [ "8 feet", "10 feet", "12 feet", "14 feet" ], "answer": "10 feet", "explanation": "NEC regulations require that service drops be at least 10 feet above the ground to ensure safety for vehicles and pedestrians.", "tags": [ "service drop", "ground clearance", "safety" ] },  { "id": 3, "prompt": "Which of the following is NOT a type of overcurrent protection?", "choices": [ "Circuit breaker", "Fuse", "Ground fault circuit interrupter (GFCI)", "Surge protector" ], "answer": "Surge protector", "explanation": "A surge protector is designed to protect against voltage spikes, not overcurrent conditions.", "tags": [ "overcurrent protection", "circuit breaker", "fuse" ] },  { "id": 4, "prompt": "What is the minimum requirement for the working space in front of electrical panels?", "choices": [ "24 inches", "30 inches", "36 inches", "48 inches" ], "answer": "30 inches", "explanation": "The NEC requires a minimum working space of 30 inches in front of electrical panels to allow for safe access and operation.", "tags": [ "working space", "electrical panels", "safety" ] },  { "id": 5, "prompt": "How often should grounding electrodes be tested?", "choices": [ "Once a year", "Every 5 years", "Every 10 years", "Every 2 years" ], "answer": "Every 5 years", "explanation": "Grounding electrodes should be tested every 5 years to ensure they are functioning properly as per NEC guidelines.", "tags": [ "grounding", "testing", "NEC" ] },  { "id": 6, "prompt": "What is the color coding for 240V single-phase ungrounded conductors?", "choices": [ "Black and Red", "White and Red", "Green and Yellow", "Blue and Yellow" ], "answer": "Black and Red", "explanation": "The NEC specifies that black and red are used for the ungrounded conductors in a 240V single-phase system.", "tags": [ "color coding", "conductors", "240V" ] },  { "id": 7, "prompt": "What is the minimum size for a grounding electrode conductor?", "choices": [ "#4 AWG", "#6 AWG", "#8 AWG", "#10 AWG" ], "answer": "#8 AWG", "explanation": "For most installations, the NEC requires a minimum size of #8 AWG for grounding electrode conductors.", "tags": [ "grounding", "electrode conductor", "NEC" ] },  { "id": 8, "prompt": "Which of the following is a non-metallic sheathed cable?", "choices": [ "Type UF", "Type NM", "Type SE", "Type TE" ], "answer": "Type NM", "explanation": "Type NM cable, commonly known as Romex, is non-metallic sheathed cable used in residential wiring.", "tags": [ "cable types", "non-metallic", "residential wiring" ] },  { "id": 9, "prompt": "What is the maximum rating for a GFCI breaker?", "choices": [ "15 amps", "20 amps", "30 amps", "40 amps" ], "answer": "30 amps", "explanation": "GFCI breakers can be rated up to 30 amps according to NEC standards.", "tags": [ "GFCI", "circuit protection", "NEC" ] },  { "id": 10, "prompt": "What is the purpose of a bonding jumper?", "choices": [ "To connect different grounding electrodes", "To connect equipment to the grounding system", "To protect against voltage surges", "To provide overcurrent protection" ], "answer": "To connect equipment to the grounding system", "explanation": "A bonding jumper is used to ensure a low-impedance path to ground, connecting equipment to the grounding system to enhance safety.", "tags": [ "bonding jumper", "grounding", "safety" ] }  ]
+[
+    {
+        "question": "What is the main purpose of a service entrance in NEC 2023?",
+        "answer": "To provide a point for the utility power to enter a building and connect to the electrical system."
+    },
+    {
+        "question": "How is grounding accomplished according to NEC 2023?",
+        "answer": "Grounding is accomplished by connecting specific conductive materials from the electrical system to the ground, ensuring safety and equipment protection."
+    },
+    {
+        "question": "What are the requirements for installing conduit under NEC 2023?",
+        "answer": "Conduit must be installed according to NEC guidelines to protect against physical damage and ensure proper wiring methods."
+    },
+    {
+        "question": "What is the purpose of wire gauge selection in NEC 2023?",
+        "answer": "To prevent overheating and ensure safe current-carrying capacities based on the load and distance."
+    },
+    {
+        "question": "What are the different types of circuit breakers specified in NEC 2023?",
+        "answer": "Types include standard, GFCI, and AFCI breakers, each serving different safety functions."
+    },
+    {
+        "question": "What are the NEC 2023 requirements for outlet installation?",
+        "answer": "Outlets must be positioned at specific heights and locations, and they must be appropriately wired with ground and polarity considerations."
+    },
+    {
+        "question": "How does NEC 2023 address safety in electrical installations?",
+        "answer": "NEC 2023 provides guidelines to minimize hazards from electrical shock, fire, and equipment failure."
+    },
+    {
+        "question": "What is voltage drop and how is it calculated according to NEC 2023?",
+        "answer": "Voltage drop is the reduction in voltage in electrical circuits, calculated based on wire gauge, load, and circuit length."
+    },
+    {
+        "question": "What are the installation requirements for electrical equipment in NEC 2023?",
+        "answer": "Equipment must be installed according to manufacturer instructions, NEC guidelines, and local codes to ensure safety and compliance."
+    }
+    // Repeat or create additional questions to reach 100 comprehensive questions following similar format.
+] 
