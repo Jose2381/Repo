@@ -1,53 +1,106 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template_string, request, redirect, session, flash
+import json
 import random
+import time
 
 app = Flask(__name__)
-app.secret_key = 'secret_key'
+app.secret_key = 'mysecretkey'  # Change to a random secret key
 
-# Sample data for users and quizzes
-users = {'user1': '1234', 'Jose2381': '5678'}  # PIN login example
-quizzes = {10: 'quiz_10', 20: 'quiz_20', 50: 'quiz_50', 100: 'quiz_100'}
+# Sample in-memory data for user sessions
+users = {
+    'user1': '1234',  # Example user and PIN
+}
 
-# Function to calculate score and explanations
-def calculate_score(answers, user_answers):
-    score = sum(1 for a, b in zip(answers, user_answers) if a == b)
-    return score
+# Load questions from a JSON file
+def load_questions():
+    with open('questions.json') as f:
+        return json.load(f)
+
+questions = load_questions()
 
 @app.route('/', methods=['GET', 'POST'])
-def login():
+def home():
     if request.method == 'POST':
-        pin = request.form['pin']
-        username = request.form['username']
-        
-        if username in users and users[username] == pin:
-            session['username'] = username
-            return redirect(url_for('dashboard'))
+        pin = request.form.get('pin')
+        if pin in users.values():
+            session['authenticated'] = True
+            session['score'] = 0
+            session['answers'] = []
+            return redirect('/quiz')
         else:
-            return "Invalid credentials!"
-    return render_template('login.html')
+            flash('Invalid PIN. Please try again.')
+    return render_template_string('''
+        <h1>Login</h1>
+        <form method="post">
+            <input type="password" name="pin" placeholder="Enter your PIN" required>
+            <button type="submit">Login</button>
+        </form>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    ''')
 
-@app.route('/dashboard')
-def dashboard():
-    if 'username' in session:
-        return render_template('dashboard.html', username=session['username'], quizzes=quizzes)
-    return redirect(url_for('login'))
-
-@app.route('/quiz/<int:num_questions>', methods=['GET', 'POST'])
-def quiz(num_questions):
-    if 'username' not in session:
-        return redirect(url_for('login'))
+@app.route('/quiz', methods=['GET', 'POST'])
+def quiz():
+    if 'authenticated' not in session:
+        return redirect('/')
     
-    questions = random.sample(range(1, 101), num_questions)
     if request.method == 'POST':
-        user_answers = request.form.getlist('answers')
-        score = calculate_score([1]*num_questions, user_answers)  # Placeholder answers
-        return render_template('results.html', score=score, total=num_questions)
-    return render_template('quiz.html', questions=questions, num_questions=num_questions)
+        question_id = int(request.form.get('question_id'))
+        selected_answer = request.form.get('answer')
+        correct_answer = questions[question_id]['answer']
 
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    return redirect(url_for('login'))
+        # Update score and answers
+        if selected_answer == correct_answer:
+            session['score'] += 1
+        session['answers'].append((questions[question_id]['question'], selected_answer, correct_answer))
+
+        # Move to the next question or show results
+        if question_id + 1 < len(questions):
+            return redirect(f'/quiz/{question_id + 1}')
+        else:
+            return redirect('/results')
+
+    question_id = int(request.args.get('question_id', 0))
+    question = questions[question_id]
+    return render_template_string('''
+        <h1>Quiz</h1>
+        <h2>{{ question.question }}</h2>
+        <form method="post">
+            {% for answer in question.answers %}
+                <input type="radio" id="{{ answer }}" name="answer" value="{{ answer }}" required>
+                <label for="{{ answer }}">{{ answer }}</label><br>
+            {% endfor %}
+            <input type="hidden" name="question_id" value="{{ loop.index0 }}">
+            <button type="submit">Next</button>
+        </form>
+    ''', question=question, loop=enumerate(questions))
+
+@app.route('/results')
+def results():
+    if 'authenticated' not in session:
+        return redirect('/')
+    
+    score = session.pop('score', 0)
+    answers = session.pop('answers', [])
+    
+    return render_template_string('''
+        <h1>Results</h1>
+        <p>Your score: {{ score }}</p>
+        <h2>Review Answers:</h2>
+        <ul>
+            {% for question, selected, correct in answers %}
+                <li>{{ question }} - Your answer: {{ selected }}; Correct answer: {{ correct }}</li>
+            {% endfor %}
+        </ul>
+        <a href="/">Logout</a>
+    ''', score=score, answers=answers)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)
