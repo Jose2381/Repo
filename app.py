@@ -1,43 +1,69 @@
-import random
-import time
+from flask import Flask, render_template, request, redirect, url_for, session
 import json
+import random
 
-class Trainer:
-    def __init__(self):
-        self.data = []
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'
+questions = []
 
-    def add_data(self, meal, calories):
-        self.data.append({"meal": meal, "calories": calories})
+# Load questions from JSON file
+def load_questions():
+    global questions
+    with open('questions.json') as f:
+        questions = json.load(f)
 
-    def get_total_calories(self):
-        return sum(item["calories"] for item in self.data)
+load_questions()
 
-    def save_to_file(self, filename):
-        with open(filename, 'w') as f:
-            json.dump(self.data, f)
+@app.route('/')
+def home():
+    return render_template('login.html')
 
-    def load_from_file(self, filename):
-        with open(filename, 'r') as f:
-            self.data = json.load(f)
+@app.route('/login', methods=['POST'])
+def login():
+    name = request.form['name']
+    pin = request.form['pin']
+    # Simple validation
+    if pin.isdigit() and len(pin) == 4:
+        session['name'] = name
+        session['pin'] = pin
+        session['attempts'] = 0
+        session['correct_answers'] = 0
+        session['quizzes'] = []
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('home'))
 
-    def display_meals(self):
-        for item in self.data:
-            print(f'Meal: {item["meal"]}, Calories: {item["calories"]}')
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html', 
+                           name=session['name'],
+                           attempts=session['attempts'],
+                           correct_answers=session['correct_answers'],
+                           accuracy=(session['correct_answers'] / session['attempts'] * 100) if session['attempts'] > 0 else 0)
+
+@app.route('/quiz/<int:num_questions>')
+def quiz(num_questions):
+    selected_questions = random.sample(questions, k=num_questions)
+    return render_template('quiz.html', questions=selected_questions)
+
+@app.route('/submit_quiz', methods=['POST'])
+def submit_quiz():
+    correct_count = 0
+    quiz_answers = request.form.getlist('answers[]')
+    for question, answer in zip(questions, quiz_answers):
+        if question['answer'] == answer:
+            correct_count += 1
+    session['attempts'] += 1
+    session['correct_answers'] += correct_count
+    session['quizzes'].append({
+        'attempt': session['attempts'],
+        'correct': correct_count
+    })
+    return redirect(url_for('dashboard'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    trainer = Trainer()
-    while True:
-        action = input("Enter 'add' to add a meal, 'show' to display meals, 'exit' to quit: ")
-        if action == 'add':
-            meal = input("Enter meal name: ")
-            calories = int(input("Enter calories: "))
-            trainer.add_data(meal, calories)
-            print(f'Added {meal} with {calories} calories.")
-        elif action == 'show':
-            trainer.display_meals()
-            print(f'Total Calories: {trainer.get_total_calories()}')
-        elif action == 'exit':
-            break
-        else:
-            print('Invalid action!')
-            time.sleep(1)
+    app.run(debug=True)
