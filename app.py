@@ -1,68 +1,50 @@
-from flask import Flask, render_template_string, request, session, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import json
+import random
 
 app = Flask(__name__)
-app.secret_key = 'some_secret_key'  # Replace with a secure key for production
+app.secret_key = 'your_secret_key_here'
 
-# Load questions from JSON
+# Load questions from questions.json
 with open('questions.json') as f:
     questions = json.load(f)
 
-# Home Route
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        pin = request.form.get('pin')
-        # Validate PIN here
-        if pin == '1234':  # Example PIN
-            session['logged_in'] = True
-            return redirect(url_for('dashboard'))
-    return render_template_string('''
-        <form method="POST">
-            <input type="password" name="pin" placeholder="Enter your PIN" required>
-            <button type="submit">Login</button>
-        </form>
-    ''')
+@app.route('/')
+def home():
+    return render_template('login.html')
 
-# Dashboard Route
+@app.route('/login', methods=['POST'])
+def login():
+    pin = request.form['pin']
+    if pin == '1234':  # Replace with actual pin validation
+        return redirect(url_for('dashboard'))
+    return 'Invalid PIN, please try again.'
+
 @app.route('/dashboard')
 def dashboard():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-    return render_template_string('''
-        <h1>Dashboard</h1>
-        <p>Select Quiz:</p>
-        <a href="/quiz/10">10 Questions</a>
-        <a href="/quiz/20">20 Questions</a>
-        <a href="/quiz/50">50 Questions</a>
-        <a href="/quiz/100">100 Questions</a>
-    ''')
+    return render_template('dashboard.html', stats={})  # Populate stats with actual data.
 
-# Quiz Route
-@app.route('/quiz/<int:num_questions>')
-def quiz(num_questions):
-    # Logic for taking the quiz
-    return render_template_string('''
-        <h1>Quiz with {{ num_questions }} Questions</h1>
-        <!-- Quiz Logic Here -->
-    ''', num_questions=num_questions)
+@app.route('/quiz', methods=['GET', 'POST'])
+def quiz():
+    if request.method == 'POST':
+        num_questions = int(request.form['number_of_questions'])
+        selected_questions = random.sample(questions['questions'], num_questions)
+        return render_template('quiz.html', questions=selected_questions)
+    return render_template('quiz_selector.html')
 
-# Score Review Route
-@app.route('/results')
-def results():
-    # Logic for displaying results
-    return render_template_string('''
-        <h1>Your Results</h1>
-        <!-- Results Logic Here -->
-    ''')
+@app.route('/submit_quiz', methods=['POST'])
+def submit_quiz():
+    score = 0
+    user_answers = request.form.getlist('answers')
+    correct_answers = request.form.getlist('correct_answers')
+    for user_answer, correct_answer in zip(user_answers, correct_answers):
+        if user_answer == correct_answer:
+            score += 1
+    return render_template('results.html', score=score, total=len(correct_answers), reviews=[])  # Populate reviews as needed.
 
-# Track Progress (placeholder)
 @app.route('/progress')
 def progress():
-    return render_template_string('''
-        <h1>Progress Tracking</h1>
-        <!-- Progress Logic Here -->
-    ''')
+    return render_template('progress.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
